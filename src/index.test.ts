@@ -1,9 +1,5 @@
-import {
-  updateSelectedServices,
-  calculatePrice,
-  ServiceYear,
-  ServiceType,
-} from ".";
+import { updateSelectedServices, calculatePrice } from ".";
+import { ServiceYear, ServiceType } from "./services";
 
 describe("updateSelectedServices.select", () => {
   test("should select when not selected", () => {
@@ -106,14 +102,14 @@ describe.each([2020, 2021, 2022])(
 
 describe.each([
   ["WeddingSession", 2020, 600],
-  // ["WeddingSession", 2021, 600],
-  // ["WeddingSession", 2022, 600],
+  ["WeddingSession", 2021, 600],
+  ["WeddingSession", 2022, 600],
   ["Photography", 2020, 1700],
-  // ["Photography", 2021, 1800],
-  // ["Photography", 2022, 1900],
+  ["Photography", 2021, 1800],
+  ["Photography", 2022, 1900],
   ["VideoRecording", 2020, 1700],
-  // ["VideoRecording", 2021, 1800],
-  // ["VideoRecording", 2022, 1900]
+  ["VideoRecording", 2021, 1800],
+  ["VideoRecording", 2022, 1900],
 ])(
   "calculatePrice.singleService (%s, %i)",
   (service: ServiceType, year: ServiceYear, expectedPrice) => {
@@ -136,8 +132,8 @@ describe.each([
 
 describe.each([
   [2020, 300],
-  //   [2021, 300],
-  //   [2022, 0],
+  [2021, 300],
+  [2022, 0],
 ])(
   "calcularePrice.photographyWithWeddingSessionPrice (%i increase by %i)",
   (year: ServiceYear, increase) => {
@@ -174,8 +170,8 @@ describe.each([
 
 describe.each([
   [2020, 300],
-  //   [2021, 300],
-  //   [2022, 300],
+  [2021, 300],
+  [2022, 300],
 ])(
   "calcularePrice.videoRecordingWithWeddingSessionPrice (%i increase by %i)",
   (year: ServiceYear, increase) => {
@@ -210,8 +206,8 @@ describe.each([
 
 describe.each([
   [2020, 500],
-  //   [2021, 500],
-  //   [2022, 600],
+  [2021, 500],
+  [2022, 600],
 ])(
   "calcularePrice.videoRecordingWithPhotographyPrice (%i increase by %i)",
   (year: ServiceYear, increase) => {
@@ -246,8 +242,8 @@ describe.each([
 
 describe.each([
   [2020, 300],
-  //   [2021, 300],
-  //   [2022, 0],
+  [2021, 300],
+  [2022, 0],
 ])(
   "calcularePrice.videoRecordingWithPhotographyWithSessionPrice (%i increase by %i)",
   (year: ServiceYear, increase) => {
