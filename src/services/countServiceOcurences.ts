@@ -1,4 +1,4 @@
-import { isMainPackageForService, safeNumberIncrese } from "../utils";
+import { isMainPackageForService, safeNumberIncrease } from "../utils";
 import { servicePackagesProvidedToClients } from "./servicePackages";
 import { ServiceType } from "./types";
 
@@ -7,12 +7,12 @@ export const countServiceOcurences = (
   service: ServiceType
 ) => {
   const serviceOcurences = services.reduce((acc, s) => {
-    acc[s] = safeNumberIncrese(acc[s], 1);
+    acc[s] = safeNumberIncrease(acc[s], 1);
 
     servicePackagesProvidedToClients
       .filter((p) => isMainPackageForService(p, s))
       .forEach((p) => {
-        acc[p.service] = safeNumberIncrese(acc[p.service], 1);
+        acc[p.service] = safeNumberIncrease(acc[p.service], 1);
       });
 
     return acc;

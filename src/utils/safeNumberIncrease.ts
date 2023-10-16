@@ -1,4 +1,4 @@
-export const safeNumberIncrese = (
+export const safeNumberIncrease = (
   base: number | undefined,
   increaseBy: number
 ) => {
