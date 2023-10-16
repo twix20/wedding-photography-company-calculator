@@ -30,13 +30,13 @@ export const calculateDiscountsToApply = (
       .appliesToServices()
       .some((s) => discountsAlreadyAppliedTo.has(s));
 
-    if (!isAlreadyApplied) {
-      c.discount
-        .appliesToServices()
-        .forEach((s) => discountsAlreadyAppliedTo.add(s));
+    if (isAlreadyApplied) return acc;
 
-      acc.push(c);
-    }
+    c.discount
+      .appliesToServices()
+      .forEach((s) => discountsAlreadyAppliedTo.add(s));
+
+    acc.push(c);
 
     return acc;
   }, []);
