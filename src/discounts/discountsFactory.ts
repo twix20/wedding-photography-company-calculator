@@ -22,6 +22,6 @@ export const discountsFactory = (year: ServiceYear) => {
         new WeddingSessionIsFreeWithPhotographyIn2022Discount(),
       ];
     default:
-      throw new Error("Unsuported year");
+      throw new Error("Unsupported year");
   }
 };
