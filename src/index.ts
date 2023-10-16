@@ -1,8 +1,8 @@
-import { ServiceDiscountContext, createDiscountsForYear } from "./discounts";
+import { ServiceDiscountContext, discountsFactory } from "./discounts";
 import {
-  ServiceYear,
   ServiceType,
-  createServicePackagesForYear,
+  ServiceYear,
+  servicePackagesFactory,
   servicePackages as allKnownServicePackages,
 } from "./services";
 
@@ -75,8 +75,8 @@ export const calculatePrice = (
 ) => {
   if (selectedServices.length === 0) return { basePrice: 0, finalPrice: 0 };
 
-  const discounts = createDiscountsForYear(selectedYear);
-  const availablePackages = createServicePackagesForYear(selectedYear);
+  const discounts = discountsFactory(selectedYear);
+  const availablePackages = servicePackagesFactory(selectedYear);
 
   const ctx: ServiceDiscountContext = {
     selectedServices: selectedServices,
