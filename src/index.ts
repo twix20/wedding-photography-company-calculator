@@ -3,18 +3,17 @@ import {
   ServiceType,
   ServiceYear,
   servicePackagesFactory,
-  servicePackages as allKnownServicePackages,
+  servicePackagesProvidedToClients,
 } from "./services";
-import { serviceNamePredicate } from "./utils";
+import { isMainPackageForService, serviceNamePredicate } from "./utils";
 
 export const updateSelectedServices = (
   previouslySelectedServices: ServiceType[],
   action: { type: "Select" | "Deselect"; service: ServiceType }
 ) => {
-  // TODO: refactor
   const { type, service } = action;
 
-  const servicePackages = allKnownServicePackages.filter((p) =>
+  const servicePackages = servicePackagesProvidedToClients.filter((p) =>
     serviceNamePredicate(p, service)
   );
 
@@ -37,34 +36,27 @@ export const updateSelectedServices = (
         (s: ServiceType) => s !== service
       );
 
-      const smartCounter = newState.reduce((acc, s) => {
-        acc[s] = acc[s] ?? 0;
-        acc[s]++;
+      const selectedServicesCounter = newState.reduce((acc, s) => {
+        acc[s] = s in acc ? ++acc[s] : 1;
 
-        const pcks = allKnownServicePackages.filter((p) =>
-          p.dependantServices.includes(s)
-        );
-
-        pcks.forEach((p) => {
-          acc[p.service] = acc[p.service] ?? 0;
-
-          acc[p.service]++;
-        });
+        servicePackagesProvidedToClients
+          .filter((p) => isMainPackageForService(p, s))
+          .forEach((p) => {
+            acc[p.service] = p.service in acc ? ++acc[p.service] : 1;
+          });
 
         return acc;
       }, {} as Record<ServiceType, number>);
 
-      const pcks22 = allKnownServicePackages.filter((p) =>
-        p.dependantServices.includes(service)
-      );
+      servicePackagesProvidedToClients
+        .filter((p) => isMainPackageForService(p, service))
+        .forEach((p) => {
+          if (selectedServicesCounter[p.service]) {
+            selectedServicesCounter[p.service]--;
+          }
+        });
 
-      pcks22.forEach((servicePackage) => {
-        if (smartCounter[servicePackage.service]) {
-          smartCounter[servicePackage.service]--;
-        }
-      });
-
-      return newState.filter((s) => smartCounter[s] > 0);
+      return newState.filter((s) => selectedServicesCounter[s] > 0);
     default:
       return previouslySelectedServices;
   }
@@ -80,10 +72,8 @@ export const calculatePrice = (
   const availablePackages = servicePackagesFactory(selectedYear);
 
   const ctx: ServiceDiscountContext = {
-    selectedServices: selectedServices,
-    selectedYear: selectedYear,
-    availablePackages: availablePackages,
-
+    selectedServices,
+    selectedYear,
     getPackage: (service) => {
       return availablePackages.find((p) => serviceNamePredicate(p, service));
     },

@@ -1,6 +1,6 @@
 import { ServicePackage } from "./types";
 
-export const servicePackages: ServicePackage[] = [
+export const servicePackagesProvidedToClients: ServicePackage[] = [
   {
     service: "Photography",
     dependantServices: [],

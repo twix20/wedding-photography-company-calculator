@@ -1,9 +1,9 @@
 import { getServicePrice } from "./getServicePrice";
-import { servicePackages } from "./servicePackages";
+import { servicePackagesProvidedToClients } from "./servicePackages";
 import { ServicePackageWithPrice, ServiceYear } from "./types";
 
 export const servicePackagesFactory = (year: ServiceYear) => {
-  return servicePackages.map(
+  return servicePackagesProvidedToClients.map(
     (p) =>
       ({
         dependantServices: [],

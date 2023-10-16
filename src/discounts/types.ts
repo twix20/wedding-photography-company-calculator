@@ -7,7 +7,6 @@ import {
 export interface ServiceDiscountContext {
   selectedServices: ServiceType[];
   selectedYear: ServiceYear;
-  availablePackages: ServicePackageWithPrice[];
   getPackage: (service: ServiceType) => ServicePackageWithPrice;
 }
 
