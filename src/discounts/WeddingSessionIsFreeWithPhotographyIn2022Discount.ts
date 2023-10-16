@@ -4,8 +4,8 @@ import { ServiceDiscount, ServiceDiscountContext } from "./types";
 export class WeddingSessionIsFreeWithPhotographyIn2022Discount
   implements ServiceDiscount
 {
-  appliesToServices() {
-    return ["WeddingSession"] as ServiceType[];
+  appliesToServices(): ServiceType[] {
+    return ["WeddingSession"];
   }
 
   canApplyDiscount(ctx: ServiceDiscountContext) {

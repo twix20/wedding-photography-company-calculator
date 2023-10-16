@@ -6,8 +6,8 @@ export class WeddingSessionBundleWithPhotographyOrVideoRecordingDiscount
 {
   constructor(private discountPrice: number) {}
 
-  appliesToServices() {
-    return ["WeddingSession"] as ServiceType[];
+  appliesToServices(): ServiceType[] {
+    return ["WeddingSession"];
   }
 
   canApplyDiscount(ctx: ServiceDiscountContext) {

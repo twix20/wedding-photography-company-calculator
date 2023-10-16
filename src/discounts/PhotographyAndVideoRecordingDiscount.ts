@@ -5,7 +5,7 @@ export class PhotographyAndVideoRecordingDiscount implements ServiceDiscount {
   constructor(private discountPrice: number) {}
 
   appliesToServices(): ServiceType[] {
-    return ["Photography", "VideoRecording"] as ServiceType[];
+    return ["Photography", "VideoRecording"];
   }
 
   canApplyDiscount(ctx: ServiceDiscountContext) {
