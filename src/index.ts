@@ -5,6 +5,7 @@ import {
   servicePackagesFactory,
   servicePackages as allKnownServicePackages,
 } from "./services";
+import { serviceNamePredicate } from "./utils";
 
 export const updateSelectedServices = (
   previouslySelectedServices: ServiceType[],
@@ -13,8 +14,8 @@ export const updateSelectedServices = (
   // TODO: refactor
   const { type, service } = action;
 
-  const servicePackages = allKnownServicePackages.filter(
-    (p) => p.service === service
+  const servicePackages = allKnownServicePackages.filter((p) =>
+    serviceNamePredicate(p, service)
   );
 
   switch (type) {
@@ -84,7 +85,7 @@ export const calculatePrice = (
     availablePackages: availablePackages,
 
     getPackage: (service) => {
-      return availablePackages.find((p) => p.service === service);
+      return availablePackages.find((p) => serviceNamePredicate(p, service));
     },
   };
 
@@ -93,7 +94,9 @@ export const calculatePrice = (
       const areAllDependantServicesSelected =
         p.dependantServices?.every((ds) => selectedServices.includes(ds)) ??
         true;
-      return areAllDependantServicesSelected && service === p.service;
+      return (
+        areAllDependantServicesSelected && serviceNamePredicate(p, service)
+      );
     })
   );
 
