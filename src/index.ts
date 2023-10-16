@@ -1,11 +1,11 @@
-import { ServiceDiscountContext, discountsFactory } from "./discounts";
+import { calculateDiscountsToApply, discountsFactory } from "./discounts";
 import {
   ServiceType,
   ServiceYear,
   servicePackagesFactory,
   servicePackagesProvidedToClients,
 } from "./services";
-import { isMainPackageForService, serviceNamePredicate } from "./utils";
+import { isMainPackageForService, serviceNamePredicate, sumBy } from "./utils";
 
 export const updateSelectedServices = (
   previouslySelectedServices: ServiceType[],
@@ -13,13 +13,13 @@ export const updateSelectedServices = (
 ) => {
   const { type, service } = action;
 
-  const servicePackages = servicePackagesProvidedToClients.filter((p) =>
-    serviceNamePredicate(p, service)
+  const packagesProvidedToClients = servicePackagesProvidedToClients.filter(
+    (p) => serviceNamePredicate(p, service)
   );
 
   switch (type) {
     case "Select":
-      const isAnyMainPackageSelected = servicePackages.some((p) =>
+      const isAnyMainPackageSelected = packagesProvidedToClients.some((p) =>
         p.dependantServices.every((ds) =>
           previouslySelectedServices.includes(ds)
         )
@@ -51,9 +51,9 @@ export const updateSelectedServices = (
       servicePackagesProvidedToClients
         .filter((p) => isMainPackageForService(p, service))
         .forEach((p) => {
-          if (selectedServicesCounter[p.service]) {
-            selectedServicesCounter[p.service]--;
-          }
+          if (!selectedServicesCounter[p.service]) return;
+
+          selectedServicesCounter[p.service]--;
         });
 
       return newState.filter((s) => selectedServicesCounter[s] > 0);
@@ -68,58 +68,22 @@ export const calculatePrice = (
 ) => {
   if (selectedServices.length === 0) return { basePrice: 0, finalPrice: 0 };
 
-  const discounts = discountsFactory(selectedYear);
-  const availablePackages = servicePackagesFactory(selectedYear);
-
-  const ctx: ServiceDiscountContext = {
-    selectedServices,
-    selectedYear,
-    getPackage: (service) => {
-      return availablePackages.find((p) => serviceNamePredicate(p, service));
-    },
-  };
+  const discountsForSelectedYear = discountsFactory(selectedYear);
+  const packagesForSelectedYear = servicePackagesFactory(selectedYear);
 
   const packagesForSelectedServices = selectedServices.map((service) =>
-    availablePackages.find((p) => {
-      const areAllDependantServicesSelected =
-        p.dependantServices?.every((ds) => selectedServices.includes(ds)) ??
-        true;
-      return (
-        areAllDependantServicesSelected && serviceNamePredicate(p, service)
-      );
-    })
+    packagesForSelectedYear.find((p) => serviceNamePredicate(p, service))
   );
 
-  const discountsAlreadyAppliedTo = [];
-
-  const allDiscountsToApply = discounts
-    .filter((d) => d.canApplyDiscount(ctx))
-    .map((d) => ({
-      discount: d,
-      amount: d.calculateDiscountAmount(ctx),
-    }))
-    .sort((a, b) => b.amount - a.amount);
-
-  const x = allDiscountsToApply.reduce((acc, c) => {
-    const isAlreadyApplied = c.discount
-      .appliesToServices()
-      .some((s) => discountsAlreadyAppliedTo.includes(s));
-
-    if (!isAlreadyApplied) {
-      discountsAlreadyAppliedTo.push(...c.discount.appliesToServices());
-
-      acc.push(c);
-    }
-
-    return acc;
-  }, []);
-
-  const sumDiscounts = x.reduce((partialSum, p) => partialSum + p.amount, 0);
-
-  const basePrice = packagesForSelectedServices.reduce(
-    (partialSum, p) => partialSum + p.price,
-    0
+  const discountsToApply = calculateDiscountsToApply(
+    selectedServices,
+    selectedYear,
+    discountsForSelectedYear,
+    packagesForSelectedYear
   );
 
-  return { basePrice, finalPrice: basePrice - sumDiscounts };
+  const discountsSum = sumBy(discountsToApply, (p) => p.amount);
+  const basePrice = sumBy(packagesForSelectedServices, (p) => p.price);
+
+  return { basePrice, finalPrice: basePrice - discountsSum };
 };
