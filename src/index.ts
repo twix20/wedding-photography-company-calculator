@@ -2,10 +2,11 @@ import { calculateDiscountsToApply, discountsFactory } from "./discounts";
 import {
   ServiceType,
   ServiceYear,
+  countServiceOcurences,
   servicePackagesFactory,
-  servicePackagesProvidedToClients,
+  isAnyMainPackageSelected,
 } from "./services";
-import { isMainPackageForService, serviceNamePredicate, sumBy } from "./utils";
+import { serviceNamePredicate, sumBy } from "./utils";
 
 export const updateSelectedServices = (
   previouslySelectedServices: ServiceType[],
@@ -13,19 +14,10 @@ export const updateSelectedServices = (
 ) => {
   const { type, service } = action;
 
-  const packagesProvidedToClients = servicePackagesProvidedToClients.filter(
-    (p) => serviceNamePredicate(p, service)
-  );
-
   switch (type) {
     case "Select":
-      const isAnyMainPackageSelected = packagesProvidedToClients.some((p) =>
-        p.dependantServices.every((ds) =>
-          previouslySelectedServices.includes(ds)
-        )
-      );
-
-      if (!isAnyMainPackageSelected) return previouslySelectedServices;
+      if (!isAnyMainPackageSelected(previouslySelectedServices, service))
+        return previouslySelectedServices;
 
       return [
         ...previouslySelectedServices.filter((s) => s !== service),
@@ -36,25 +28,7 @@ export const updateSelectedServices = (
         (s: ServiceType) => s !== service
       );
 
-      const selectedServicesCounter = newState.reduce((acc, s) => {
-        acc[s] = s in acc ? ++acc[s] : 1;
-
-        servicePackagesProvidedToClients
-          .filter((p) => isMainPackageForService(p, s))
-          .forEach((p) => {
-            acc[p.service] = p.service in acc ? ++acc[p.service] : 1;
-          });
-
-        return acc;
-      }, {} as Record<ServiceType, number>);
-
-      servicePackagesProvidedToClients
-        .filter((p) => isMainPackageForService(p, service))
-        .forEach((p) => {
-          if (!selectedServicesCounter[p.service]) return;
-
-          selectedServicesCounter[p.service]--;
-        });
+      const selectedServicesCounter = countServiceOcurences(newState, service);
 
       return newState.filter((s) => selectedServicesCounter[s] > 0);
     default:
