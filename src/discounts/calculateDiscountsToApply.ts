@@ -16,9 +16,7 @@ export const calculateDiscountsToApply = (
     },
   };
 
-  const discountsAlreadyAppliedTo = [];
-
-  const allDiscountsToApply = discounts
+  const sortedDiscountsByDiscountAmount = discounts
     .filter((d) => d.canApplyDiscount(ctx))
     .map((d) => ({
       discount: d,
@@ -26,13 +24,16 @@ export const calculateDiscountsToApply = (
     }))
     .sort((a, b) => b.amount - a.amount);
 
-  const x = allDiscountsToApply.reduce((acc, c) => {
+  const discountsAlreadyAppliedTo = new Set<ServiceType>();
+  const discountsToApply = sortedDiscountsByDiscountAmount.reduce((acc, c) => {
     const isAlreadyApplied = c.discount
       .appliesToServices()
-      .some((s) => discountsAlreadyAppliedTo.includes(s));
+      .some((s) => discountsAlreadyAppliedTo.has(s));
 
     if (!isAlreadyApplied) {
-      discountsAlreadyAppliedTo.push(...c.discount.appliesToServices());
+      c.discount
+        .appliesToServices()
+        .forEach((s) => discountsAlreadyAppliedTo.add(s));
 
       acc.push(c);
     }
@@ -40,5 +41,5 @@ export const calculateDiscountsToApply = (
     return acc;
   }, []);
 
-  return x;
+  return discountsToApply;
 };
