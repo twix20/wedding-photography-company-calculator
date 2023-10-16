@@ -4,11 +4,11 @@ import { ServicePackageWithPrice, ServiceYear } from "./types";
 
 export const servicePackagesFactory = (year: ServiceYear) => {
   return servicePackagesProvidedToClients.map(
-    (p) =>
+    (servicePackage) =>
       ({
         dependantServices: [],
-        ...p,
-        price: getServicePrice(year, p.service),
+        ...servicePackage,
+        price: getServicePrice(year, servicePackage.service),
       } as ServicePackageWithPrice)
   );
 };

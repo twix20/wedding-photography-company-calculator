@@ -12,15 +12,17 @@ export const calculateDiscountsToApply = (
     selectedServices,
     selectedYear,
     getPackage: (service) => {
-      return servicePackages.find((p) => serviceNamePredicate(p, service));
+      return servicePackages.find((servicePackage) =>
+        serviceNamePredicate(servicePackage, service)
+      );
     },
   };
 
   const sortedDiscountsByDiscountAmount = discounts
-    .filter((d) => d.canApplyDiscount(ctx))
-    .map((d) => ({
-      discount: d,
-      amount: d.calculateDiscountAmount(ctx),
+    .filter((discount) => discount.canApplyDiscount(ctx))
+    .map((discount) => ({
+      discount,
+      amount: discount.calculateDiscountAmount(ctx),
     }))
     .sort((a, b) => b.amount - a.amount);
 
@@ -28,13 +30,13 @@ export const calculateDiscountsToApply = (
   const discountsToApply = sortedDiscountsByDiscountAmount.reduce((acc, c) => {
     const isAlreadyApplied = c.discount
       .appliesToServices()
-      .some((s) => discountsAlreadyAppliedTo.has(s));
+      .some((service) => discountsAlreadyAppliedTo.has(service));
 
     if (isAlreadyApplied) return acc;
 
     c.discount
       .appliesToServices()
-      .forEach((s) => discountsAlreadyAppliedTo.add(s));
+      .forEach((service) => discountsAlreadyAppliedTo.add(service));
 
     acc.push(c);
 

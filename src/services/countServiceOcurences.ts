@@ -10,20 +10,25 @@ export const countServiceOcurences = (
     acc[s] = safeNumberIncrease(acc[s], 1);
 
     servicePackagesProvidedToClients
-      .filter((p) => isMainPackageForService(p, s))
-      .forEach((p) => {
-        acc[p.service] = safeNumberIncrease(acc[p.service], 1);
+      .filter((servicePackage) => isMainPackageForService(servicePackage, s))
+      .forEach((servicePackage) => {
+        acc[servicePackage.service] = safeNumberIncrease(
+          acc[servicePackage.service],
+          1
+        );
       });
 
     return acc;
   }, {} as Record<ServiceType, number>);
 
   servicePackagesProvidedToClients
-    .filter((p) => isMainPackageForService(p, service))
-    .forEach((p) => {
-      if (!serviceOcurences[p.service]) return;
+    .filter((servicePackage) =>
+      isMainPackageForService(servicePackage, service)
+    )
+    .forEach((servicePackage) => {
+      if (!serviceOcurences[servicePackage.service]) return;
 
-      serviceOcurences[p.service]--;
+      serviceOcurences[servicePackage.service]--;
     });
 
   return serviceOcurences;

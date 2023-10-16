@@ -7,11 +7,13 @@ export const isAnyMainPackageSelected = (
   service: ServiceType
 ) => {
   const packagesProvidedToClients = servicePackagesProvidedToClients.filter(
-    (p) => serviceNamePredicate(p, service)
+    (servicePackage) => serviceNamePredicate(servicePackage, service)
   );
 
-  const isAnyMainSelected = packagesProvidedToClients.some((p) =>
-    p.dependantServices.every((ds) => servicePackages.includes(ds))
+  const isAnyMainSelected = packagesProvidedToClients.some((servicePackage) =>
+    servicePackage.dependantServices.every((dependantService) =>
+      servicePackages.includes(dependantService)
+    )
   );
 
   return isAnyMainSelected;

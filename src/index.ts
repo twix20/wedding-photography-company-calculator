@@ -20,17 +20,19 @@ export const updateSelectedServices = (
         return previouslySelectedServices;
 
       return [
-        ...previouslySelectedServices.filter((s) => s !== service),
+        ...previouslySelectedServices.filter(
+          (previousService) => previousService !== service
+        ),
         service,
       ];
     case "Deselect":
       const newState = previouslySelectedServices.filter(
-        (s: ServiceType) => s !== service
+        (previousService: ServiceType) => previousService !== service
       );
 
       const selectedServicesCounter = countServiceOcurences(newState, service);
 
-      return newState.filter((s) => selectedServicesCounter[s] > 0);
+      return newState.filter((service) => selectedServicesCounter[service] > 0);
     default:
       return previouslySelectedServices;
   }
@@ -46,12 +48,15 @@ export const calculatePrice = (
   const packagesForSelectedYear = servicePackagesFactory(selectedYear);
 
   const packagesForSelectedServices = selectedServices.map((service) =>
-    packagesForSelectedYear.find((p) => serviceNamePredicate(p, service))
+    packagesForSelectedYear.find((servicePackage) =>
+      serviceNamePredicate(servicePackage, service)
+    )
   );
 
   const discountsToApply = calculateDiscountsToApply(
     selectedServices,
     selectedYear,
+
     discountsForSelectedYear,
     packagesForSelectedYear
   );
